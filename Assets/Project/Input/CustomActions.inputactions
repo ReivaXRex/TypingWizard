@@ -1,0 +1,54 @@
+{
+    "name": "CustomActions",
+    "maps": [
+        {
+            "name": "Main",
+            "id": "c48db1cb-6ed8-4f20-932c-5d7db38b6d30",
+            "actions": [
+                {
+                    "name": "Move",
+                    "type": "Button",
+                    "id": "447c6b8d-45a2-42f5-90d2-33eedf96e8ec",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Typing",
+                    "type": "Button",
+                    "id": "5b22c447-e1ca-4b8c-ac3d-a3db351696ca",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "2066d28a-50d0-4aff-93d3-f86ec0fc2fd1",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b2ba1e0e-7dcc-4865-939e-6e3fc81a78d1",
+                    "path": "<Keyboard>/anyKey",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Typing",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
