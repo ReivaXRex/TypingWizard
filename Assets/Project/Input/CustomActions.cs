@@ -44,6 +44,15 @@ public partial class @CustomActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Spell Cast"",
+                    ""type"": ""Button"",
+                    ""id"": ""aedf0a34-5365-4b31-8ad8-25d47bbde0ce"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -68,6 +77,17 @@ public partial class @CustomActions: IInputActionCollection2, IDisposable
                     ""action"": ""Typing"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f2548b43-0256-46d4-bb8b-33a2e59b801c"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Spell Cast"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -78,6 +98,7 @@ public partial class @CustomActions: IInputActionCollection2, IDisposable
         m_Main = asset.FindActionMap("Main", throwIfNotFound: true);
         m_Main_Move = m_Main.FindAction("Move", throwIfNotFound: true);
         m_Main_Typing = m_Main.FindAction("Typing", throwIfNotFound: true);
+        m_Main_SpellCast = m_Main.FindAction("Spell Cast", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -141,12 +162,14 @@ public partial class @CustomActions: IInputActionCollection2, IDisposable
     private List<IMainActions> m_MainActionsCallbackInterfaces = new List<IMainActions>();
     private readonly InputAction m_Main_Move;
     private readonly InputAction m_Main_Typing;
+    private readonly InputAction m_Main_SpellCast;
     public struct MainActions
     {
         private @CustomActions m_Wrapper;
         public MainActions(@CustomActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_Main_Move;
         public InputAction @Typing => m_Wrapper.m_Main_Typing;
+        public InputAction @SpellCast => m_Wrapper.m_Main_SpellCast;
         public InputActionMap Get() { return m_Wrapper.m_Main; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -162,6 +185,9 @@ public partial class @CustomActions: IInputActionCollection2, IDisposable
             @Typing.started += instance.OnTyping;
             @Typing.performed += instance.OnTyping;
             @Typing.canceled += instance.OnTyping;
+            @SpellCast.started += instance.OnSpellCast;
+            @SpellCast.performed += instance.OnSpellCast;
+            @SpellCast.canceled += instance.OnSpellCast;
         }
 
         private void UnregisterCallbacks(IMainActions instance)
@@ -172,6 +198,9 @@ public partial class @CustomActions: IInputActionCollection2, IDisposable
             @Typing.started -= instance.OnTyping;
             @Typing.performed -= instance.OnTyping;
             @Typing.canceled -= instance.OnTyping;
+            @SpellCast.started -= instance.OnSpellCast;
+            @SpellCast.performed -= instance.OnSpellCast;
+            @SpellCast.canceled -= instance.OnSpellCast;
         }
 
         public void RemoveCallbacks(IMainActions instance)
@@ -193,5 +222,6 @@ public partial class @CustomActions: IInputActionCollection2, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnTyping(InputAction.CallbackContext context);
+        void OnSpellCast(InputAction.CallbackContext context);
     }
 }
