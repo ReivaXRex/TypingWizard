@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class FireballSpell : Spell
 { 
+    /*
     FireballSpell()
     {
         spellName = "fireball";
@@ -26,6 +27,6 @@ public class FireballSpell : Spell
         // Destroy the projectile after its lifetime
         Destroy(projectile, projectileLifetime);
     }
-
+    */
 
 }

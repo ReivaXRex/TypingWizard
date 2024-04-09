@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour, IDamageable
+public class PlayerData : MonoBehaviour, IDamageable
 {
     public string playerName;
 

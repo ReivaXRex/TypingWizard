@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ThunderOrbSpell : Spell
-{
+{/*
     ThunderOrbSpell()
     {
         spellName = "thunderorb";
@@ -28,4 +28,5 @@ public class ThunderOrbSpell : Spell
         // Destroy the projectile after its lifetime
         Destroy(projectile, projectileLifetime);
     }
+    */
 }

@@ -4,14 +4,24 @@ using UnityEngine;
 
 public class PlayerSpellInventory : MonoBehaviour
 {
-    public Spell[] spells;
+    public SpellScriptableObject[] spellData;
 
+    public Spell[] spells;
+    public string[] SpellWordBank = new string[3];
     public int currentSpellIndex = 0;
 
     public delegate void SpellSwitched();
     public static event SpellSwitched OnSpellSwitched;
 
-    // public int maxSpellCount = 3;
+    private void Start()
+    {
+        spells = new Spell[spellData.Length];
+        for (int i = 0; i < spellData.Length; i++)
+        {
+            spells[i] = spellData[i].spellPrefab.GetComponent<Spell>();
+        }
+        FillSpellWordBank();
+    }
 
     public void Update()
     {
@@ -38,7 +48,8 @@ public class PlayerSpellInventory : MonoBehaviour
 
     public string GetSpellName()
     {
-        return spells[currentSpellIndex].spellName;
+        //return spellData[currentSpellIndex].name;
+        return spells[currentSpellIndex].spellData.spellName;
     }
 
 
@@ -50,5 +61,48 @@ public class PlayerSpellInventory : MonoBehaviour
             OnSpellSwitched?.Invoke();
         }
     }
+
+
+    public void FillSpellWordBank()
+    {
+        for (int i = 0; i < spells.Length; i++)
+        {
+            SpellWordBank[i] = spellData[i].spellName;
+            //SpellWordBank[i] = spells[i].spellData.spellName;
+        }
+
+        /*
+        foreach (string spell in spellBank)
+        {
+            Debug.Log(spell);
+        }
+        */
+    }
+
+    public Spell GetSpellFromWord(string word)
+    {
+        for (int i = 0; i < spellData.Length; i++)
+        {
+            /*
+            if (spellData[i].spellName == word)
+            {
+                return spells[i];
+            }*/
+            
+            if (spells[i].spellData.spellName == word)
+            {
+                return spells[i];
+            }
+        }
+
+        return null;
+    }
+
+    public Spell currentSpellToCast // Corrected as a property
+    {
+        get { return spells[currentSpellIndex]; }
+        // get { return spells[currentSpellIndex]; }
+    }
+
 
 }

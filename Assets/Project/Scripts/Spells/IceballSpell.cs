@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class IceballSpell : Spell
 {
+    /*
     IceballSpell()
     {
         spellName = "iceball";
@@ -26,5 +27,5 @@ public class IceballSpell : Spell
 
         // Destroy the projectile after its lifetime
         Destroy(projectile, projectileLifetime);
-    }
+    }*/
 }

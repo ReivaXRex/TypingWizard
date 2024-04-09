@@ -4,15 +4,21 @@ using UnityEngine.UI;
 
 public class TypeCasting : MonoBehaviour
 {
-    public string[] spellBank = new string[3];
+    //public string[] spellBank = new string[3];
     public Text wordOutput = null;
 
     PlayerSpellInventory playerSpellInventory;
 
     private string remainingWord = string.Empty;
+    public bool spellCasted = true;
 
+    public delegate void SpellCompleted(Spell spell);
+    public static event SpellCompleted OnSpellCompleted;
+
+    /*
     public delegate void WordCompleted();
     public static event WordCompleted OnWordCompleted;
+    */
 
     /*
     public delegate void WordSwitched();
@@ -26,16 +32,17 @@ public class TypeCasting : MonoBehaviour
 
     void Start()
     {
-        FillSpellBank();
+        playerSpellInventory.FillSpellWordBank();
         SetCurrentWord();
         PlayerSpellInventory.OnSpellSwitched += UpdateWord;
+        spellCasted = true;
     }
 
     void Update()
     {
         CheckInput();
     }
-
+    /*
     public void FillSpellBank()
     {
         for (int i = 0; i < spellBank.Length; i++)
@@ -48,14 +55,14 @@ public class TypeCasting : MonoBehaviour
         {
             Debug.Log(spell);
         }
-        */
-    }
+        
+    }*/
 
     public void SetCurrentWord()
     {
         // Debug.Log("Setting current word");
         int spellIndex = playerSpellInventory.currentSpellIndex;
-        SetRemainingWord(spellBank[spellIndex]);
+        SetRemainingWord(playerSpellInventory.SpellWordBank[spellIndex]);
     }
 
     private void SetRemainingWord(string word)
@@ -72,7 +79,7 @@ public class TypeCasting : MonoBehaviour
 
     public void CheckInput()
     {
-        if (Input.anyKeyDown)
+        if (Input.anyKeyDown )//&& !spellCasted)
         {
             string keysPressed = Input.inputString;
 
@@ -83,8 +90,8 @@ public class TypeCasting : MonoBehaviour
 
             if (IsWordComplete())
             {
-                //Debug.Log("Word completed correctly");
-                OnWordCompleted?.Invoke();
+                OnSpellCompleted?.Invoke(playerSpellInventory.GetSpellFromWord(remainingWord));
+                spellCasted = false; // Trigger new event
             }
         }
     }
@@ -98,8 +105,8 @@ public class TypeCasting : MonoBehaviour
             if (IsWordComplete())
             {
                 SetCurrentWord();
-                //Debug.Log("Word completed correctly");
-                OnWordCompleted?.Invoke();
+                OnSpellCompleted?.Invoke(playerSpellInventory.GetSpellFromWord(remainingWord));
+                spellCasted = false;// Trigger new event
             }
         }
     }

@@ -12,20 +12,18 @@ public class PlayerController : MonoBehaviour
     CustomActions inputActions;
 
     NavMeshAgent agent;
-    [SerializeField]
-    Animator animator;
+    
+    [SerializeField] Animator animator;
 
     [Header("Movement")]
     [SerializeField] LayerMask clickableLayer;
 
-    //float lookRotationSpeed = 2f;
 
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         inputActions = new CustomActions();
         AssignInputs();
-
     }
 
     void AssignInputs()
