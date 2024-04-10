@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.InputSystem;
+
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,36 +9,24 @@ public class PlayerController : MonoBehaviour
 
     CustomActions inputActions;
 
-    NavMeshAgent agent;
-    
+    [Header("Animation")]
     [SerializeField] Animator animator;
 
     [Header("Movement")]
+    [SerializeField] NavMeshAgent agent;
     [SerializeField] LayerMask clickableLayer;
+    [SerializeField] float rotationSpeed = 10.0f;
 
+    [Header("Movement Indicator")]
+    [SerializeField] GameObject movementIndicator;
 
     void Awake()
     {
-        agent = GetComponent<NavMeshAgent>();
+        //agent = GetComponent<NavMeshAgent>();
         inputActions = new CustomActions();
         AssignInputs();
     }
 
-    void AssignInputs()
-    {
-        inputActions.Main.Move.performed += ctx => ClickToMove();
-
-    }
-
-    void ClickToMove()
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 100, clickableLayer))
-        {
-            agent.destination = hit.point;
-            
-        }
-    }
 
     void OnEnable()
     {
@@ -54,17 +40,25 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        //FaceTarget();
+        FaceTarget();
         SetAnimation();
     }
 
-    /*
     void FaceTarget()
     {
-        Vector3 direction = (agent.destination - transform.position).normalized;
-        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * lookRotationSpeed);
-    }*/
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+        {
+            Vector3 targetPosition = hit.point;
+            targetPosition.y = transform.position.y; // Keep the same height to avoid tilting
+
+            Vector3 lookDirection = targetPosition - transform.position;
+            Quaternion rotation = Quaternion.LookRotation(lookDirection);
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * rotationSpeed);
+        }
+    }
 
     void SetAnimation()
     {
@@ -77,6 +71,24 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetBool(IDLE, true);
             animator.SetBool(WALK, false);
+        }
+    }
+
+    void AssignInputs()
+    {
+        inputActions.Main.Move.performed += ctx => ClickToMove();
+
+    }
+
+    void ClickToMove()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 100, clickableLayer))
+        {
+
+            agent.destination = hit.point;
+            GameObject indicator = Instantiate(movementIndicator, hit.point, Quaternion.identity);
+
         }
     }
 }

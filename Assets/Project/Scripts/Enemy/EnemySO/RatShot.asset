@@ -10,17 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a57cec64200124b49a3f49ca40a08006, type: 3}
-  m_Name: Fireball
+  m_Name: RatShot
   m_EditorClassIdentifier: 
-  spellName: fireball
-  manaCost: 12
-  manaCooldown: 3
-  lifeTime: 3
-  speed: 9
-  damageAmount: 8
+  spellName: RatShot
+  manaCost: 0
+  lifeTime: 2
+  speed: 8
+  damageAmount: 10
   areaOfEffectRadius: 0
-  spellPrefab: {fileID: 4605988242526458399, guid: 3535ec4bf2855d243aa7031a913fbe38,
+  spellPrefab: {fileID: 7733146562480491541, guid: 417a5f86f80abd740a036aee792bf4c3,
     type: 3}
-  debuffType: 1
+  debuffType: 0
   spellType: 0
   elementalType: 0

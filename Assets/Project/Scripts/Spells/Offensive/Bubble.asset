@@ -12,11 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a57cec64200124b49a3f49ca40a08006, type: 3}
   m_Name: Bubble
   m_EditorClassIdentifier: 
-  spellName: Bubble
-  manaCost: 0
-  lifeTime: 2
-  speed: 2
+  spellName: bubbleball
+  manaCost: 8
+  manaCooldown: 3
+  lifeTime: 3
+  speed: 7
   damageAmount: 5
   areaOfEffectRadius: 0
   spellPrefab: {fileID: 1322607612336579891, guid: 44c77c525f6def04b9ab599abf14e701,
     type: 3}
+  debuffType: 3
+  spellType: 0
+  elementalType: 1
