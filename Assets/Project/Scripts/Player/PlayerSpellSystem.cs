@@ -1,69 +1,79 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using static TypeCasting;
+using UnityEngine.InputSystem;
 
 public class PlayerSpellSystem : MonoBehaviour
 {
-    [SerializeField] private Spell spellToCast;
+    private CustomActions inputActions;
+    private Quaternion preSpellRotation;
+    Transform playerTransform;
+    private Vector3 targetIndicatorOffset = new Vector3(0, 0.5f, 0);
+    
+    [Header("Player Animator")]
+    [SerializeField] private Animator animator;
 
+    [Header("Player Data")]
+    [SerializeField] private PlayerScriptableObject playerData;
+
+    /*
+    [Header("Player Mana")]
     [SerializeField] private float maxMana = 100.0f;
     [SerializeField] private float currentMana;
-    [SerializeField] private float manaRegenRate = 2.0f;
+    [SerializeField] private float manaRegenRate = 2.0f;*/
+
+    [Header("Casting")]
+    [SerializeField] private Spell spellToCast;
     [SerializeField] public Transform spawnPoint;
     [SerializeField] PlayerSpellInventory playerSpellInventory;
-    [SerializeField] private Animator animator;
     [SerializeField] private TypeCasting playerTypeCasting;
-
-    [SerializeField] private GameObject fireSpellAura, iceSpellAura, poisonSpellAura, 
-        lightningSpellAura, defenseSpellAura;
-
-    //TO REMOVE:
-    //[SerializeField] private float spellCooldown = .25f;
-   // [SerializeField] private float currentCastTimer;
-
-    //public GameObject spellPrefab;
+    [SerializeField] GameObject targetIndicator;
+    [SerializeField] LayerMask clickableLayer;
     [SerializeField] private bool isCasting = false;
-
-   // private CustomActions playerControls;
-
     public int currentSpellIndex;
-  
 
-    // Start is called before the first frame update
+    [Header("Auras")]
+    [SerializeField] private GameObject[] spellAuras; // 0 = fire, 1 = ice, 2 = poison, 3 = lightning, 4 = defense
+    [SerializeField] private GameObject currentSpellAura;
+    [SerializeField] private int spellAuraIndex;
+
+   
+    void Awake()
+    {
+        inputActions = new CustomActions();
+        AssignInputs(); 
+    }
+
     void Start()
     {
-        playerSpellInventory = GetComponent<PlayerSpellInventory>();
-        playerTypeCasting = GetComponent<TypeCasting>();
-        // playerControls = new CustomActions();
+        //playerSpellInventory = GetComponent<PlayerSpellInventory>();
+        //playerTypeCasting = GetComponent<TypeCasting>();
+        playerTransform = GetComponent<Transform>();
+
         TypeCasting.OnSpellCompleted += ReceiveSpellToCast;
-        // animator = GetComponent<Animator>();
+
+    }
+
+    private void Update()
+    {
+        if (!isCasting)
+            Invoke("RechargeMana", playerData.manaRechargeDelay);
+    }
+
+    void AssignInputs()
+    {
+        inputActions.Main.SpellCast.performed += ctx => CastSpell();
+
     }
 
     private void OnEnable()
     {
-      //  playerControls.Enable();
+        inputActions.Enable();
     }
 
     private void OnDisable()
     {
-      //  playerControls.Disable();
+        inputActions.Disable();
     }   
-
-    // Update is called once per frame
-    void Update()
-    {
-        currentSpellIndex = playerSpellInventory.currentSpellIndex;
-        if (Input.GetKeyDown(KeyCode.Space) && !isCasting && !playerTypeCasting.spellCasted) // Change the key to whatever you want
-        {
-            CastSpell();
-            playerTypeCasting.spellCasted = true;
-           // isCasting = false;
-        }
-
-        //playerTypeCasting.spellCasted = false;
-        //isCasting = false;
-    }
 
     private void OnDestroy()
     {
@@ -76,107 +86,80 @@ public class PlayerSpellSystem : MonoBehaviour
         animator.SetTrigger("CastSpell");
     }
 
-    // This method is called from the Animation Event in the Animator
-    public void SpawnProjectile()
-    {
-        StartCoroutine(DelayedSpawn());
-    }
 
-    IEnumerator DelayedSpawn()
+    IEnumerator SpawnProjectileTowardsMouse()
     {
-        // Adjust the delay time as needed (in seconds)
-        float delay = 0.35f; // Example: 1 second delay
-        yield return new WaitForSeconds(delay);
+        yield return null;
 
-        // Spawn the projectile after the delay
-        Vector3 direction = spawnPoint.forward;
-        GameObject projectile = Instantiate(playerSpellInventory.spells[currentSpellIndex].spellData.spellPrefab, spawnPoint.position, Quaternion.LookRotation(direction));
-        Rigidbody rb = projectile.GetComponent<Rigidbody>();
-        rb.velocity = direction * playerSpellInventory.spells[currentSpellIndex].spellData.speed;
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, clickableLayer))
+        {
+            GameObject indicator = Instantiate(targetIndicator, hit.point + targetIndicatorOffset, Quaternion.identity);
+
+            Vector3 direction = (hit.point - spawnPoint.position).normalized;
+            GameObject projectile = Instantiate(playerSpellInventory.spells[currentSpellIndex].spellData.spellPrefab, spawnPoint.position, Quaternion.LookRotation(direction));
+            Rigidbody rb = projectile.GetComponent<Rigidbody>();
+            rb.velocity = direction * playerSpellInventory.spells[currentSpellIndex].spellData.speed;
+            Destroy(projectile, playerSpellInventory.spells[currentSpellIndex].spellData.lifeTime);
+        }
         
-        Destroy(projectile, playerSpellInventory.spells[currentSpellIndex].spellData.lifeTime);
-        //playerSpellInventory.spells[currentSpellIndex].CastSpell(spawnPoint);
+        playerTypeCasting.spellCasted = true;
+        isCasting = false;
     }
 
-
-    /*
-    void OnWordCompleted()
-    {
-        Debug.Log("OnWordCompleted event received");
-        if(!isCasting)
-        {
-            isCasting = true;
-            currentCastTimer = 0;
-            StartSpellCastingAnimation();
-            SpawnProjectile();
-        }
-        if(isCasting)
-        {
-            currentCastTimer += Time.deltaTime;
-
-            if(currentCastTimer > spellCooldown)
-            {
-                isCasting = false;
-               
-            }
-        }
-        //playerSpellCasting.SpawnSpell();
-    }*/
-
+   
     public void CastSpell()
     {
-        Debug.Log("CastSpell event received");
-        if (!isCasting)
+        //Debug.Log("CastSpell event received");
+        currentSpellIndex = playerSpellInventory.currentSpellIndex;
+
+        if (playerSpellInventory.spells[currentSpellIndex].spellData.manaCost > playerData.mana)
         {
+            Debug.Log("Not enough mana to cast spell");
+            return;
+        }
+
+        if (!isCasting && !playerTypeCasting.spellCasted)
+        {
+            preSpellRotation = transform.rotation;
+
             isCasting = true;
-            // currentCastTimer = 0;
+           
+
             DisplaySpellAura();
+
             StartSpellCastingAnimation();
-            SpawnProjectile();
+            StartCoroutine(SpawnProjectileTowardsMouse());
             StartCoroutine(CastReset());
             StartCoroutine(HideSpellAura());
+
+            playerData.mana -= playerSpellInventory.spells[currentSpellIndex].spellData.manaCost;
+            UIManager.Instance.UpdateManaText((int)playerData.mana, (int)playerData.maxMana);
+
         }
     }
 
     IEnumerator CastReset()
     { 
-        // Adjust the delay time as needed (in seconds)
-        float delay = 0.35f; // Example: 1 second delay
+        float delay = 0.35f; 
         yield return new WaitForSeconds(delay);
 
-        // Spawn the projectile after the delay
         isCasting = false;
     }
 
     IEnumerator HideSpellAura()
     {
-        // Adjust the delay time as needed (in seconds)
-        float delay = 2.5f; // Example: 1 second delay
+        float delay = 2.5f; 
         yield return new WaitForSeconds(delay);
 
-        // Spawn the projectile after the delay
+        foreach (GameObject aura in spellAuras)
+        {
+            if (aura.activeSelf)
+            {
+                aura.SetActive(false);
+            }
+        }
 
-        // check to see if the aura is active
-        if (fireSpellAura.activeSelf)
-        {
-            fireSpellAura.SetActive(false);
-        }
-        else if (iceSpellAura.activeSelf)
-        {
-            iceSpellAura.SetActive(false);
-        }
-        else if (lightningSpellAura.activeSelf)
-        {
-            lightningSpellAura.SetActive(false);
-        }
-        else if (poisonSpellAura.activeSelf)
-        {
-            poisonSpellAura.SetActive(false);
-        }
-        else if (defenseSpellAura.activeSelf)
-        {
-            defenseSpellAura.SetActive(false);
-        }
     }
 
     public void ReceiveSpellToCast(Spell spell)
@@ -189,22 +172,37 @@ public class PlayerSpellSystem : MonoBehaviour
         switch (playerSpellInventory.spells[currentSpellIndex].spellData.elementalType)
         {
             case SpellScriptableObject.ElementalType.Fire:
-                fireSpellAura.SetActive(true);
+                currentSpellAura = spellAuras[0];
+                spellAuras[0].SetActive(true);
                 break;
             case SpellScriptableObject.ElementalType.Ice:
-                iceSpellAura.SetActive(true);
-                break;
-            case SpellScriptableObject.ElementalType.Lightning:
-                lightningSpellAura.SetActive(true);
+                currentSpellAura = spellAuras[1];
+                spellAuras[1].SetActive(true);
                 break;
             case SpellScriptableObject.ElementalType.Poison:
-                poisonSpellAura.SetActive(true);
+                currentSpellAura = spellAuras[2];
+                spellAuras[2].SetActive(true);
                 break;
-            case SpellScriptableObject.ElementalType.Earth:
-                defenseSpellAura.SetActive(true);
+            case SpellScriptableObject.ElementalType.Lightning:
+                currentSpellAura = spellAuras[3];
+                spellAuras[3].SetActive(true);
+                break;
+            case SpellScriptableObject.ElementalType.Defense:
+                currentSpellAura = spellAuras[4];
+                spellAuras[4].SetActive(true);
                 break;
             default:
                 break;
         }
     }
+
+    private void RechargeMana()
+    {
+        //recharge mana over time
+        playerData.mana += playerData.manaRechargeRate * Time.deltaTime;
+        playerData.mana = Mathf.Clamp(playerData.mana, 0, playerData.maxMana);
+        UIManager.Instance.UpdateManaText((int)playerData.mana, (int)playerData.maxMana);
+
+    }
+
 }

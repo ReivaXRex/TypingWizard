@@ -13,10 +13,14 @@ MonoBehaviour:
   m_Name: Iceball
   m_EditorClassIdentifier: 
   spellName: iceball
-  manaCost: 0
-  lifeTime: 4
-  speed: 2
+  manaCost: 10
+  manaCooldown: 3
+  lifeTime: 9
+  speed: 5
   damageAmount: 10
   areaOfEffectRadius: 0
   spellPrefab: {fileID: 4605988242526458399, guid: 50cdff034d3833c47b772406ec7b2b71,
     type: 3}
+  debuffType: 4
+  spellType: 0
+  elementalType: 1

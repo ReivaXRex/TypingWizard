@@ -12,11 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a57cec64200124b49a3f49ca40a08006, type: 3}
   m_Name: ThunderOrb
   m_EditorClassIdentifier: 
-  spellName: fireball
-  manaCost: 0
-  lifeTime: 4
-  speed: 7
-  damageAmount: 10
+  spellName: thunderorb
+  manaCost: 14
+  manaCooldown: 3
+  lifeTime: 3
+  speed: 10
+  damageAmount: 12
   areaOfEffectRadius: 0
-  spellPrefab: {fileID: 4605988242526458399, guid: 3535ec4bf2855d243aa7031a913fbe38,
+  spellPrefab: {fileID: 4605988242526458399, guid: faafb858f01b1e74cb3129e84b345e76,
     type: 3}
+  debuffType: 5
+  spellType: 0
+  elementalType: 3

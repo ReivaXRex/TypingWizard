@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Spell", menuName = "Spells")]
+[CreateAssetMenu(fileName = "New Spell", menuName = "Spell")]
 public class SpellScriptableObject : ScriptableObject
 {
     public string spellName;
     public float manaCost;
+    public float manaCooldown;
     public float lifeTime;
     public float speed;
     public int damageAmount;
@@ -43,11 +44,10 @@ public class SpellScriptableObject : ScriptableObject
     public enum ElementalType
     {
         Fire,
-        Water,
         Ice,
+        Poison,
         Lightning,
-        Earth,
-        Air,
-        Poison
+        Defense
+       
     }
 }

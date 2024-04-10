@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerSpellInventory : MonoBehaviour
@@ -7,7 +5,10 @@ public class PlayerSpellInventory : MonoBehaviour
     public SpellScriptableObject[] spellData;
 
     public Spell[] spells;
+
     public string[] SpellWordBank = new string[3];
+    
+    [HideInInspector]
     public int currentSpellIndex = 0;
 
     public delegate void SpellSwitched();
@@ -43,6 +44,14 @@ public class PlayerSpellInventory : MonoBehaviour
         else if(Input.GetKeyDown(KeyCode.Alpha3))
         {
             SetCurrentSpell(2);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            SetCurrentSpell(3);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            SetCurrentSpell(4);
         }
     }
 

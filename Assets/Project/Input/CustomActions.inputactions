@@ -24,7 +24,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Spell Cast",
+                    "name": "SpellCast",
                     "type": "Button",
                     "id": "aedf0a34-5365-4b31-8ad8-25d47bbde0ce",
                     "expectedControlType": "Button",
@@ -63,7 +63,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Spell Cast",
+                    "action": "SpellCast",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
