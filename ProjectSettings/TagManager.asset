@@ -8,6 +8,7 @@ TagManager:
   - Indicator
   - Spell
   - EnemySpell
+  - Undefined
   layers:
   - Default
   - TransparentFX
@@ -18,8 +19,8 @@ TagManager:
   - Clickable
   - Ground
   - Player
-  - 
-  - 
+  - Projectile
+  - Walls
   - 
   - 
   - 

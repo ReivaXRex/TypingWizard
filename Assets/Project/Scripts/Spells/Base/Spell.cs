@@ -30,6 +30,8 @@ public class Spell : MonoBehaviour
             damageable.TakeDamage(damageAmount);
             if(other.gameObject.tag != "Indicator")
             Destroy(gameObject, 0.5f);
+
+            Destroy(gameObject);
         }
     }
 

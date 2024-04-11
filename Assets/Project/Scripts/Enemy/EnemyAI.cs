@@ -3,35 +3,39 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-    const string IDLE = "Idle";
-    const string WALK = "Walk";
+    const string IDLE = "IsIdle";
+    const string WALK = "IsWalking";
     const string ATTACK = "Attack";
     const string SHOOT = "Shoot";
 
+    [Header("AI")]
     public NavMeshAgent agent;
 
-    public Transform player;
-    public Transform spawnPoint;
+    [Header("Transforms")]
+    [SerializeField] private Transform player;
+    [SerializeField] private Transform spawnPoint;
 
-    public LayerMask whatIsGround, whatIsPlayer;
-
+    [Header("Layer Masks")]
+    [SerializeField] private LayerMask groundLayer, playerLayer;
+    
+    [Header("Transforms")]
     public GameObject projectile;
-    private SphereCollider attackCollider;
 
+    [Header("Animator")]
+    [SerializeField] Animator animator;
+
+
+    private SphereCollider attackCollider;
     private Enemy enemy;
 
-    Vector3 walkPoint;
-    bool walkPointSet;
-    public float walkPointRange;
+    private Vector3 walkPoint;
+    private bool walkPointSet;
+    
+    private float walkPointRange;
 
-    public float timeBetweenAttacks;
-    bool alreadyAttacked;
+    [SerializeField] private float aggroRange, attackRange, projectileSpeed, attackSpeed;
+    private bool playerInSightRange, playerInAttackRange, alreadyAttacked;
 
-    public float sightRange, attackRange;
-    public float projectileSpeed;
-    public bool playerInSightRange, playerInAttackRange;
-
-    [SerializeField] Animator animator;
 
     private void Awake()
     {
@@ -39,9 +43,9 @@ public class EnemyAI : MonoBehaviour
         if (enemy != null && enemy.enemyData != null)
         {
             agent.speed = enemy.enemyData.speed;
-            sightRange = enemy.enemyData.aggroRange;
+            aggroRange = enemy.enemyData.aggroRange;
             attackRange = enemy.enemyData.attackRange;
-            timeBetweenAttacks = enemy.enemyData.attackSpeed;
+            attackSpeed = enemy.enemyData.attackSpeed;
             projectileSpeed = enemy.enemyData.projectileSpeed;
         }
         agent = GetComponent<NavMeshAgent>();
@@ -51,10 +55,13 @@ public class EnemyAI : MonoBehaviour
 
     private void Update()
     {
+        if (enemy.isDead)
+            return;
+
         SetWalkingAnimation();
 
-        playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
-        playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
+        playerInSightRange = Physics.CheckSphere(transform.position, aggroRange, playerLayer);
+        playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, playerLayer);
 
         if (!playerInSightRange && !playerInAttackRange) Patrolling();
         if (playerInSightRange && !playerInAttackRange) ChasePlayer();
@@ -73,7 +80,7 @@ public class EnemyAI : MonoBehaviour
 
         walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
 
-        if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround))
+        if (Physics.Raycast(walkPoint, -transform.up, 2f, groundLayer))
             walkPointSet = true;
     }
 
@@ -93,20 +100,22 @@ public class EnemyAI : MonoBehaviour
             if (enemy.enemyData.attackType == EnemyScriptableObject.AttackType.Ranged)
             {
                 alreadyAttacked = true;
-                Invoke(nameof(ResetAttack), timeBetweenAttacks);
-                RangedAttack();
+                Invoke(nameof(ResetAttack), attackSpeed);
+                Debug.Log("Ranged attack");
+                PlayRangedAttackAnimation();
             }
             else if (enemy.enemyData.attackType == EnemyScriptableObject.AttackType.Melee)
             {
                 alreadyAttacked = true;
-                Invoke(nameof(ResetAttack), timeBetweenAttacks);
-                MeleeAttack();
+                Invoke(nameof(ResetAttack), attackSpeed);
+                Debug.Log("Melee attack");
+                PlayMeleeAttackAnimation();
             }
             else
             {
                 // Magic attack
             }
-            // Attack code here
+          
        
         }
     }
@@ -121,28 +130,27 @@ public class EnemyAI : MonoBehaviour
         animator.SetTrigger(SHOOT);
     }
 
-    private void RangedAttack()
-    {
-        PlayRangedAttackAnimation();
 
-        Vector3 direction = (player.position - transform.position).normalized;
+    private void SpawnProjectile()
+    {
+
         Rigidbody rb = Instantiate(projectile, spawnPoint.position, Quaternion.identity).GetComponent<Rigidbody>();
-        rb.velocity = direction * projectileSpeed;
+        Debug.Log("SpawnProjectile");
+        rb.velocity = SetProjectileDirection() * projectileSpeed;
+
         Destroy(rb.gameObject, 1.0f);
-        //rb.AddForce(transform.forward * projectileSpeed, ForceMode.Impulse);
-        //rb.AddForce(transform.up * 20f, ForceMode.Impulse);
+    }
+
+    private Vector3 SetProjectileDirection()
+    {
+        Vector3 direction = (player.position - transform.position).normalized;
+        return direction;
     }
 
     private void PlayMeleeAttackAnimation()
     {
         animator.SetTrigger(ATTACK);
 
-    }
-
-
-    private void MeleeAttack()
-    {
-        PlayMeleeAttackAnimation();
     }
 
 

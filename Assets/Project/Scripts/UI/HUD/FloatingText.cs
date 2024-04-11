@@ -11,7 +11,6 @@ public class FloatingText : MonoBehaviour
 
     public Vector3 offset;
 
-    // Start is called before the first frame update
     void Start()
     {
         mainCamera = Camera.main.transform;
@@ -21,7 +20,6 @@ public class FloatingText : MonoBehaviour
         transform.SetParent(worldSpaceCanvas);
     }
 
-    // Update is called once per frame
     void Update()
     {
         transform.rotation = Quaternion.LookRotation(transform.position - mainCamera.transform.position);

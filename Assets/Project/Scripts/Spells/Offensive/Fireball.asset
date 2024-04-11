@@ -17,7 +17,7 @@ MonoBehaviour:
   manaCooldown: 3
   lifeTime: 3
   speed: 9
-  damageAmount: 8
+  damageAmount: 20
   areaOfEffectRadius: 0
   spellPrefab: {fileID: 4605988242526458399, guid: 3535ec4bf2855d243aa7031a913fbe38,
     type: 3}

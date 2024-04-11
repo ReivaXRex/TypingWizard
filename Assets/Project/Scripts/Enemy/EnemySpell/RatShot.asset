@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a57cec64200124b49a3f49ca40a08006, type: 3}
+  m_Name: RatShot
+  m_EditorClassIdentifier: 
+  spellName: RatShot
+  manaCost: 0
+  manaCooldown: 0
+  lifeTime: 2
+  speed: 8
+  damageAmount: 10
+  areaOfEffectRadius: 0
+  spellPrefab: {fileID: 7733146562480491541, guid: 417a5f86f80abd740a036aee792bf4c3,
+    type: 3}
+  debuffType: 0
+  spellType: 0
+  elementalType: 0

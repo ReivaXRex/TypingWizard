@@ -15,12 +15,6 @@ public class PlayerSpellSystem : MonoBehaviour
     [Header("Player Data")]
     [SerializeField] private PlayerScriptableObject playerData;
 
-    /*
-    [Header("Player Mana")]
-    [SerializeField] private float maxMana = 100.0f;
-    [SerializeField] private float currentMana;
-    [SerializeField] private float manaRegenRate = 2.0f;*/
-
     [Header("Casting")]
     [SerializeField] private Spell spellToCast;
     [SerializeField] public Transform spawnPoint;
@@ -45,8 +39,7 @@ public class PlayerSpellSystem : MonoBehaviour
 
     void Start()
     {
-        //playerSpellInventory = GetComponent<PlayerSpellInventory>();
-        //playerTypeCasting = GetComponent<TypeCasting>();
+
         playerTransform = GetComponent<Transform>();
 
         TypeCasting.OnSpellCompleted += ReceiveSpellToCast;
@@ -87,27 +80,39 @@ public class PlayerSpellSystem : MonoBehaviour
     }
 
 
-    IEnumerator SpawnProjectileTowardsMouse()
+    public void SpawnProjectile()
     {
-        yield return null;
+        GameObject projectile = Instantiate(playerSpellInventory.spells[currentSpellIndex].spellData.spellPrefab, spawnPoint.position, Quaternion.LookRotation(SetSpellDirection()));
+        Rigidbody rb = projectile.GetComponent<Rigidbody>();
+        rb.velocity = SetSpellDirection() * playerSpellInventory.spells[currentSpellIndex].spellData.speed;
+        Destroy(projectile, playerSpellInventory.spells[currentSpellIndex].spellData.lifeTime);
 
-        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, clickableLayer))
-        {
-            GameObject indicator = Instantiate(targetIndicator, hit.point + targetIndicatorOffset, Quaternion.identity);
-
-            Vector3 direction = (hit.point - spawnPoint.position).normalized;
-            GameObject projectile = Instantiate(playerSpellInventory.spells[currentSpellIndex].spellData.spellPrefab, spawnPoint.position, Quaternion.LookRotation(direction));
-            Rigidbody rb = projectile.GetComponent<Rigidbody>();
-            rb.velocity = direction * playerSpellInventory.spells[currentSpellIndex].spellData.speed;
-            Destroy(projectile, playerSpellInventory.spells[currentSpellIndex].spellData.lifeTime);
-        }
-        
         playerTypeCasting.spellCasted = true;
         isCasting = false;
     }
 
-   
+    public Vector3 SetSpellDirection()
+    {
+        Vector3 direction = Vector3.zero;
+
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, clickableLayer))
+        {
+            SpawnTargetIndicator(hit);
+            direction = (hit.point - spawnPoint.position).normalized;
+
+        }
+
+        return direction;
+    }
+
+    public void SpawnTargetIndicator(RaycastHit hit)
+    {
+    
+            GameObject indicator = Instantiate(targetIndicator, hit.point + targetIndicatorOffset, Quaternion.identity);
+        
+    }
+
     public void CastSpell()
     {
         //Debug.Log("CastSpell event received");
@@ -129,7 +134,6 @@ public class PlayerSpellSystem : MonoBehaviour
             DisplaySpellAura();
 
             StartSpellCastingAnimation();
-            StartCoroutine(SpawnProjectileTowardsMouse());
             StartCoroutine(CastReset());
             StartCoroutine(HideSpellAura());
 
@@ -198,7 +202,6 @@ public class PlayerSpellSystem : MonoBehaviour
 
     private void RechargeMana()
     {
-        //recharge mana over time
         playerData.mana += playerData.manaRechargeRate * Time.deltaTime;
         playerData.mana = Mathf.Clamp(playerData.mana, 0, playerData.maxMana);
         UIManager.Instance.UpdateManaText((int)playerData.mana, (int)playerData.maxMana);

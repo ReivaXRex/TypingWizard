@@ -3,27 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class UIManager : MonoBehaviour
 {
-    // Singleton instance
     private static UIManager _instance;
 
-    // Property to access the singleton instance
     public static UIManager Instance
     {
         get
         {
-            // If the instance doesn't exist, try to find it in the scene
             if (_instance == null)
             {
                 _instance = FindObjectOfType<UIManager>();
 
-                // If it's still not found, log a warning
                 if (_instance == null)
                 {
                     Debug.LogWarning("UIManager instance not found in the scene. Creating a new one.");
-                    // Create a new GameObject and add UIManager component to it
                     GameObject obj = new GameObject("UIManager");
                     _instance = obj.AddComponent<UIManager>();
                 }
@@ -32,16 +28,17 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // Your UIManager methods and properties go here
-
     [SerializeField] private TextMeshProUGUI healthText;
     [SerializeField] private TextMeshProUGUI manaText;
-    [SerializeField] private List<Text> enemyHealthText;
+    [SerializeField] private List<GameObject> enemyList;
+    [SerializeField] private List<GameObject> enemyHealthTextGameObjectList;
+    [SerializeField] private List<TextMeshProUGUI> enemyHealthTextTMPList = new List<TextMeshProUGUI>();
     [SerializeField] private Text spellText;
+
 
     private void Awake()
     {
-        // Ensure there's only one instance of UIManager
+
         if (_instance != null && _instance != this)
         {
             Destroy(gameObject);
@@ -49,11 +46,84 @@ public class UIManager : MonoBehaviour
         else
         {
             _instance = this;
-            DontDestroyOnLoad(gameObject); // Ensures that the UIManager persists between scenes
+            DontDestroyOnLoad(gameObject); 
+        }
+
+    }
+
+
+    private void Start()
+    {
+
+        SpawnManager.OnEnemySpawnedEvent += () => AddEnemyToList(SpawnManager.Instance.GetLastSpawnedEnemy());
+        SpawnManager.OnEnemySpawnedEvent += () => AddEnemyHealthTextList(SpawnManager.Instance.GetLastSpawnedEnemyHealthText());
+        SpawnManager.OnEnemySpawnedEvent += () => AddEnemyHealthTextTMPList(SpawnManager.Instance.GetLastSpawnedEnemyHealthTextTMP());
+
+        /*
+        Enemy.OnEnemyDeathEvent += () => RemoveEnemyFromList(Enemy.spawnIndex);
+        Enemy.OnEnemyDeathEvent += () => RemoveEnemyHealthTextList(Enemy.spawnIndex);
+        Enemy.OnEnemyDeathEvent += () => RemoveEnemyHealthTextTMPList(Enemy.spawnIndex);
+
+        Enemy.OnEnemyDeathEvent += RemoveEnemy;
+        */
+
+    }
+
+    public void AddEnemyToList(GameObject enemy)
+    {
+        enemyList.Add(enemy);
+    }
+
+    public void AddEnemyHealthTextList(GameObject enemyHealthText)
+    {
+        enemyHealthTextGameObjectList.Add(enemyHealthText);
+    }
+
+    public void AddEnemyHealthTextTMPList(TextMeshProUGUI enemyHealthTextTMP)
+    {
+        enemyHealthTextTMPList.Add(enemyHealthTextTMP);
+    }
+
+    public void RemoveEnemyFromList(int index)
+    {
+        if (index >= 0 && index < enemyList.Count)
+        {
+            enemyList.RemoveAt(index);
+        }
+        else
+        {
+            Debug.LogWarning("Attempting to remove enemy from list with invalid index.");
         }
     }
 
-    
+    public void RemoveEnemyHealthTextList(int index)
+    {
+        if (index >= 0 && index < enemyHealthTextGameObjectList.Count)
+        {
+            enemyHealthTextGameObjectList.RemoveAt(index);
+        }
+        else
+        {
+            Debug.LogWarning("Attempting to remove enemy health text from list with invalid index.");
+        }
+    }
+
+    public void RemoveEnemyHealthTextTMPList(int index)
+    {
+        enemyHealthTextTMPList.RemoveAt(index);
+    }
+
+    /*
+    public void RemoveEnemy()
+    {
+        int spawnIndex = SpawnManager.Instance.GetSpawnIndexForEnemy(Enemy.gameObject);
+        RemoveEnemyFromList(spawnIndex);
+        RemoveEnemyHealthTextList(spawnIndex);
+        RemoveEnemyHealthTextTMPList(spawnIndex);
+    }*/
+
+
+
     public void UpdateHealthText(int health, int maxHealth)
     {
 
@@ -69,11 +139,28 @@ public class UIManager : MonoBehaviour
     {
         spellText.text = spellName;
     }
-
-    public void UpdateEnemyHealthText(int index, int health, int maxHealth)
+    
+    public void UpdateEnemyHealthText(TextMeshProUGUI tmp, int health, int maxHealth)
     {
-        enemyHealthText[index].text = "HP: " + health.ToString() + "/" + maxHealth.ToString(); ;
+        tmp.text = "HP: " + health.ToString() + "/" + maxHealth.ToString();
     }
+
+    private void OnDestroy()
+    {
+        SpawnManager.OnEnemySpawnedEvent -= () => AddEnemyToList(SpawnManager.Instance.GetLastSpawnedEnemy());
+        SpawnManager.OnEnemySpawnedEvent -= () => AddEnemyHealthTextList(SpawnManager.Instance.GetLastSpawnedEnemyHealthText());
+        SpawnManager.OnEnemySpawnedEvent -= () => AddEnemyHealthTextTMPList(SpawnManager.Instance.GetLastSpawnedEnemyHealthTextTMP());
+
+        /*
+        Enemy.OnEnemyDeathEvent -= () => RemoveEnemyFromList(Enemy.SpawnIndex);
+        Enemy.OnEnemyDeathEvent -= () => RemoveEnemyHealthTextList(Enemy.spawnIndex);
+        Enemy.OnEnemyDeathEvent -= () => RemoveEnemyHealthTextTMPList(Enemy.spawnIndex);
+
+        Enemy.OnEnemyDeathEvent -= RemoveEnemy;
+        */
+    }
+
+   
 
 
 }

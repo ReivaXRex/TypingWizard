@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 public class TypeCasting : MonoBehaviour
 {
-    //public Text spellTextUIText = null;
 
     [SerializeField] PlayerSpellInventory playerSpellInventory;
 
@@ -39,7 +38,7 @@ public class TypeCasting : MonoBehaviour
     {
         remainingWord = word;
         UIManager.Instance.UpdateSpellText(remainingWord);
-        //spellTextUIText.text = remainingWord;
+   
     }
 
     private void UpdateWord()
@@ -50,7 +49,7 @@ public class TypeCasting : MonoBehaviour
 
     public void CheckInput()
     {
-        if (Input.anyKeyDown )//&& !spellCasted)
+        if (Input.anyKeyDown )
         {
             string keysPressed = Input.inputString;
 
@@ -62,7 +61,7 @@ public class TypeCasting : MonoBehaviour
             if (IsWordComplete())
             {
                 OnSpellCompleted?.Invoke(playerSpellInventory.GetSpellFromWord(remainingWord));
-                spellCasted = false; // Trigger new event
+                spellCasted = false; 
             }
         }
     }
@@ -77,7 +76,7 @@ public class TypeCasting : MonoBehaviour
             {
                 SetCurrentWord();
                 OnSpellCompleted?.Invoke(playerSpellInventory.GetSpellFromWord(remainingWord));
-                spellCasted = false;// Trigger new event
+                spellCasted = false;
             }
         }
     }
